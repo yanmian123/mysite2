@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>{% block title %}博客首页{% endblock %}-Powered by python222</title>
+
+    <link href="{% static "bootstrap/css/bootstrap.css" %}" rel="stylesheet"/>
+    <!-- 新增自定义样式表，用于优化整体样式 -->
+    <link href="{% static "bootstrap/css/custom2.css" %}" rel="stylesheet"/>
+    <link href="{% static "bootstrap/css/blog2.css" %}" rel="stylesheet"/>
+    <link href="{% static "bootstrap/css2/bootstrap.css" %}" rel="stylesheet">
+    <script src="{% static "bootstrap\js2\bootstrap.bundle.js.map" %}"></script>
+
+</head>
+ 
+<body>
+    <div class="container">
+        <!-- 顶部导航栏和logo区域 -->  
+        <div class="row align-items-center" style="background-color: #f8f9fa; padding: 10px 0;">
+            <div class="col-md-4">
+                <img style="width: 326px; height: 60px; display: block; margin: 0 auto;" alt="开源博客系统"
+                    src="{% static "images/logo.png" %}">
+            </div>
+            <div class="col-md-8">
+                <iframe style="float: right;" width="400" scrolling="no" height="60" frameborder="0"
+                    allowtransparency="true"
+                    src="http://i.tianqi.com/index.php?c=code&id=12&icon=1&num=5"></iframe>
+            </div>
+        </div>
+        <!-- 导航菜单区域 -->
+        <div class="row">
+            <div class="col-md-12" style="padding-top: 10px; padding-bottom: 10px;">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="{% url 'article' id 1 0 %}">博客首页</a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button> 
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'album' id 1 %}">我的相册</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'about' id %}">关于我</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'message2' id page%}">留言</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'admin:index' %}">博客后台管理</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'article_create' %}">发布博客</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'concerns' id 1%}">关注</a>
+                                </li>
+                            </ul>
+                            <form class="d-flex" role="search" method="post" action="{% url 'search' id 1 %}"
+                            onsubmit="return checkSearchForm()">
+                            {% csrf_token %}
+                            <input class="form-control me-2" type="search" placeholder="请输入搜索内容..." 
+                                aria-label="Search" name="v" id="v" value="{{ v }}">
+                            <button class="btn btn-success" type="submit">Search</button> <!-- 按钮颜色改为绿色 -->
+                        </form>
+                        </div>  
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+       
+
+        <!-- 底部信息区域 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div align="center" style="padding-top: 50px; padding-bottom: 30px; border-top: 1px solid #ccc;">
+                    <span style="float: left;">Powered by <a href="http://python222.com"
+                            target="_blank">Python222</a></span>
+                    Copyright © 2012-2025 Python知识分享网 版权所有
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block script %}
+    {% endblock %}
+    <script>
+        function checkSearchForm() {
+            var v = $("#v").val();
+            if (v == null || v == '') {
+                alert("请输入搜索内容！");
+                return false;
+            }
+            return true;
+        }
+    </script>
+    <script src="{% static "bootstrap/js/bootstrap.js" %}"></script>
+    <script src="{% static "jquery-1.11.2.min.js" %}"></script>
+</body>
+
+</html>

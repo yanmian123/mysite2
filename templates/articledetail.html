@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="data_list">
+        <div class="data_list_title">
+            <img src="{% static 'images/lyf.png' %}" style="width: 10px; height: 10px;"/>
+            博客信息
+        </div>
+        <div class="datas">
+            <div class="blog_title">
+                <h3><strong>{{ article.title }}</strong></h3>
+            </div>
+        </div>
+        <div class="blog_info">
+            作者：{{ user.name}} &nbsp;&nbsp;&nbsp;&nbsp; 
+            发布时间：{{ article.create_time|date:'Y-m-d H:i' }} &nbsp;&nbsp;&nbsp;&nbsp; 阅读量：{{ article.reads }}
+        </div>
+        <div class="blog_content">
+            <p>{{ article.content|safe }}</p>
+        </div>
+        <div class="container my-5">
+            <h2 class="mb-4">评论区</h2>
+
+            <!-- 评论输入区域，使用表单 -->
+            <form action="" method="post" onsubmit="return checkForm()">
+                {% csrf_token%}
+                <div class="mb-3">
+                    <label for="commentInput" class="form-label">发表评论</label>
+                    <textarea class="form-control" id="commentInput" name="content" rows="3" placeholder="写下你的评论..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mb-4">提交评论</button>
+            </form>
+            <!-- 评论展示区域 -->
+            <div class="card">
+                <div class="card-body">
+                    <!-- 示例评论 -->  
+                    {% for tag in articlecomment %}
+                    <div class="media mb-3">
+                        <img src="https://picsum.photos/50/50" class="rounded-circle me-3" alt="用户头像">
+                        <div class="media-body">
+                            <h5 class="mt-0">{{ tag.user }}</h5>
+                            <p>{{ tag.content }}</p>
+                            <small class="text-muted">
+                                {{ tag.create_time }}
+                            </small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm" onclick="showReplyInput({{ tag.id }})">回复</button> 
+                    <button type="button" class="btn btn-sm" onclick="toggleReplies({{ tag.id }})">查看回复</button>
+                    <form action="{% url 'commentreply' tag.id tag.article.id %}" method="post"
+                          class="position bottom-0 end-0 " style="margin-left: 70%; display: none;" id="replyForm_{{ tag.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent_comment_id" value="{{ tag.id }}">
+                        <div class="mb-3">
+                            <label for="commentInput_{{ tag.id }}" class="form-label">发表回复</label>
+                            <textarea class="form-control" id="commentInput_{{ tag.id }}" name="content" rows="3" placeholder="写下你的回复..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-4">提交回复</button>
+                        <button type="button" class="btn btn-sm" onclick="hideReplyInput({{ tag.id }})">取消回复</button>
+                    </form>
+                    <form action="{% url 'commentdelete' tag.id %}" method="post" 
+                          class="position bottom-0 end-0 " style="margin-left: 90%;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm">删除评论</button>
+                    </form>
+                    <div id="replies_{{ tag.id }}" style="display: none;">
+                        {% for reply in tag.replies.all %}
+                        <div class="media mb-3 reply-comment">
+                            <img src="https://picsum.photos/30/30" class="rounded-circle me-3" alt="用户头像">
+                            <div class="media-body">
+                                <h6 class="mt-0">{{ reply.user }} 回复 {{ tag.user }}</h6>
+                                <p class="small">{{ reply.content }}</p>
+                                <small class="text-muted">
+                                    {{ reply.create_time }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        function toggleReplies(commentId) {
+            var replies = document.getElementById('replies_' + commentId);
+            if (replies.style.display === 'none') {
+                replies.style.display = 'block';
+            } else {
+                replies.style.display = 'none';
+            }
+        }
+
+        function showReplyInput(tagId) {
+            var replyForm = document.getElementById('replyForm_' + tagId);
+            replyForm.style.display = 'block';
+        }
+
+        function hideReplyInput(tagId) {
+            var replyForm = document.getElementById('replyForm_' + tagId);
+            replyForm.style.display = 'none';
+        }
+
+        function checkForm() {
+            var content = document.getElementById('commentInput').value;
+            if (content === null || content === "") {
+                alert("评论内容不能为空！");
+                return false;
+            }
+            return true;
+        }
+    </script>
+{% endblock %}

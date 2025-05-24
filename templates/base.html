@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>{% block title %}博客首页{% endblock %}-Powered by python222</title>
+
+    <link href="{% static "bootstrap/css/bootstrap.css" %}" rel="stylesheet"/>
+    <!-- 新增自定义样式表，用于优化整体样式 -->
+    <link href="{% static "bootstrap/css/custom2.css" %}" rel="stylesheet"/>
+    <link href="{% static "bootstrap/css/blog2.css" %}" rel="stylesheet"/>
+    <link href="{% static "bootstrap/css2/bootstrap.css" %}" rel="stylesheet">
+
+
+    <script src="{% static "bootstrap\js2\bootstrap.bundle.js.map" %}"></script>
+
+    <style>
+        /* 初始隐藏搜索表单 */
+        #search-form {
+            display: none;
+        }
+    </style>
+
+</head>
+ 
+<body>
+    <div class="container">
+        <!-- 顶部导航栏和logo区域 -->  
+        <div class="row align-items-center" style="background-color: #f8f9fa; padding: 10px 0;">
+            <div class="col-md-4">
+                <img style="width: 326px; height: 60px; display: block; margin: 0 auto;" alt="开源博客系统"
+                    src="{% static "images/logo.png" %}">
+            </div>
+            <div class="col-md-8">
+                <iframe style="float: right;" width="400" scrolling="no" height="60" frameborder="0"
+                    allowtransparency="true"
+                    src="http://i.tianqi.com/index.php?c=code&id=12&icon=1&num=5"></iframe>
+            </div>
+        </div>
+        <!-- 导航菜单区域 -->
+        <div class="row">
+            <div class="col-md-12" style="padding-top: 10px; padding-bottom: 10px;">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="{% url 'article' id 1 0 %}">博客首页</a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'album' id 1%}">我的相册</a>
+                                </li> 
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'about' id %}">关于我</a>
+                                </li> 
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'message2' id 1 %}">留言</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'admin:index' %}">博客后台管理</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'article_create' %}">发布博客</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'concerns' id 1%}">关注</a>
+                                </li>
+                            </ul>
+
+                                <!-- 搜索表单 -->
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person-add" viewBox="0 0 16 16" id="search-icon" onclick="toggleSearchForm()">
+                                <path fill-rule="evenodd" d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5-5a.5.5 0 0 0-1 0v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1Zm-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+                                <path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/>
+                              </svg>
+
+
+                              <form id="search-form" method="post" action="{% url 'searchuser' id 1 %}"
+                              onsubmit="return checkSearchForm2()">
+                              {% csrf_token%}
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" placeholder="查找的用户名" name="uservalue" id="uservalue" value="{{ uservalue}}">
+                                    <label for="search-icon">用户</label>
+                                  </div>
+                                  <button class="btn btn-success" type="submit">Search</button> <!-- 按钮颜色改为绿色 -->
+                            </form>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <form class="d-flex" role="search" method="post" action="{% url 'search' id 1 %}"
+                                onsubmit="return checkSearchForm()">
+                                {% csrf_token %}
+                                <input class="form-control me-2" type="search" placeholder="请输入搜索内容..." 
+                                    aria-label="Search" name="v" id="v" value="{{ v }}">
+                                <button class="btn btn-success" type="submit">Search</button> <!-- 按钮颜色改为绿色 -->
+                            </form>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 主体内容区域 -->
+        <div class="row">
+            <div class="col-md-9">
+                {% block content %}
+                {% endblock %}
+            </div>
+            <div class="col-md-3">
+                <!-- 关于我模块 -->
+                <div class="data_list border rounded p-3 mb-3">
+
+                    <span class="input-group-text" id="basic-addon1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5ZM13 7.207l-5-5-5 5V13.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7.207Z"></path>
+
+        </svg>
+                      &nbsp;关于我</span>
+                    <div class="user_image text-center">
+                        <img src="{%static 'images/lyf.png'%}" class="rounded-circle mb-2"
+                            style="width: 100px; height: 100px;">
+                    </div>
+                    <div class="nickName text-center">{{ user.name }}</div>
+                    <div class="userSign text-center">({{ user.company }})</div>
+                </div>
+                <!-- 日志类别模块 -->
+                <div class="data_list border rounded p-3 mb-3">
+                    <div class="data_list_title d-flex align-items-center mb-2">
+                        <img src="{% static 'images/lyf.png' %}" class="me-2"
+                            style="width: 30px; height: 30px;"/>
+                        <div>按日志类别</div>
+                    </div>
+                    <div class="datas">
+                        <ul class="list-unstyled">
+                            {% for type in articleTypelist%}
+                            <li><span><a href={%url 'article' id 1 type.id %}>{{ type.name}}</a></span></li>
+                            {% endfor %} 
+                        </ul>
+                    </div>
+                </div>
+                <!-- 友情链接模块 -->
+                <div class="data_list border rounded p-3">
+                    <div class="data_list_title d-flex align-items-center mb-2">
+                        <img src="{% static 'images/lyf.png' %}" class="me-2"
+                            style="width: 30px; height: 30px;"/>
+                        友情链接
+                    </div>
+                    <div class="datas">
+                        <ul >
+                            {% for link in linklist%}
+                            <li><span><a href="{{ link.url }}" target="_blank">{{ link.name}}</a></span></li>
+                            {% endfor %}
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部信息区域 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div align="center" style="padding-top: 50px; padding-bottom: 30px; border-top: 1px solid #ccc;">
+                    <span style="float: left;">Powered by <a href="http://python222.com"
+                            target="_blank">Python222</a></span>
+                    Copyright © 2012-2025 Python知识分享网 版权所有
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block script %}
+    {% endblock %}
+    <script>
+        function checkSearchForm() {
+            var v = $("#v").val();
+            if (v == null || v == '') {
+                alert("请输入搜索内容！");
+                return false;
+            }
+            return true;
+        }
+
+        function checkSearchForm2() {
+            var value = $("#uservalue").val();
+            if (value == null || value == '') {
+                alert("请输入搜索内容！");
+                return false;
+            }
+            return true;
+        }
+
+        function toggleSearchForm() {
+            var searchForm = document.getElementById('search-form');
+            if (searchForm.style.display === 'none') {
+                searchForm.style.display = 'block';
+            } else {
+                searchForm.style.display = 'none';
+            }
+        }
+    </script>
+    <script src="{% static "bootstrap/js/bootstrap.js" %}"></script>
+    <script src="{% static "jquery-1.11.2.min.js" %}"></script>
+</body>
+
+</html>

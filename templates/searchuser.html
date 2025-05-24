@@ -1,0 +1,48 @@
+<!-- mysite2/templates/search_results.html -->
+{% extends "base.html" %}
+{% block title %}搜索结果 - {{ uservalue }}{% endblock %}
+{% block content %}
+    <h2>搜索结果：{{ uservalue }}</h2>
+    {% if userlist %}
+        <ul>
+            {% for user3 in userlist %}
+                <li>
+                    <a href="{% url 'article' user3.id 1 0  %}">{{ user3.name}}<button type="button" class="btn "  style="background-color: var(--bs-warning-bg-subtle); --bs-border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text);float: right;">关注</button></a>
+                    <p>{{ user3.name|truncatewords:20 }}</p>
+                    {% comment %} <div class="px-3 py-2 rounded-2 border" style="background-color: var(--bs-warning-bg-subtle); --bs-border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text);">Background subtle</div> {% endcomment %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>未找到相关结果。</p>
+    {% endif %}
+    <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+        <ul class="pagination">
+            {% if searchuser2.has_previous %}
+          <li class="page-item ">
+            <a class="page-link" href="{% url 'searchuser' id searchuser2.previous_page_number %}?uservalue={{ namevalue }}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% endif %}
+          {% if searchuser2.object_list %}
+                {% for page in searchuser2.paginator.page_range %}
+                    {% if page == searchuser2.number %} 
+                        <li class="page-item active" aria-current='page'>
+                            <a class="page-link" href="{% url 'searchuser' id page %}?uservalue={{ namevalue }}">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="{% url 'searchuser' id page %}?uservalue={{ namevalue }}">{{ page }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if searchuser2.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="{% url 'searchuser' id searchuser2.next_page_number %}?uservalue={{ namevalue }}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endblock %}

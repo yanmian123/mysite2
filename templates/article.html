@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="data_list">
+        <div class="data_list_title">
+            <img src="{% static 'images/lyf.png' %}" style="width: 50px; height: 50px;"/>
+            博客列表
+        </div>
+        <div class="datas">
+            {% if not pagedata.object_list %}
+            <p style="text-align: center;padding-top: 10px">未查询到结果！</p>
+            {% else %}
+            <ul>
+                {% for article in pagedata.object_list %}
+                    <li style="margin-bottom: 30px">
+                        <span class="date">
+                            <a href="{% url 'articledetail' id article.id %}">{{ article.create_time | date:'Y年m月d日' }}</a>
+                        </span>
+                            <span class="title">
+                                <a href="">{{ article.title }}</a>
+                            </span>
+                            <span class="summary">{{ article.abstract }}</span>
+                                <span class="img">
+                                    {% if article.image %}
+                                        <img src="{{ article.image.url }}" style="width: 100px; height: 100px;"/>
+                                    {% endif %}
+                                </span>
+                                <span class="info">发表于 {{ article.create_time |date:'Y-m-d H:i' }} 阅读({{ article.reads }})</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+            {% endif %}
+        </div>
+            <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+                <ul class="pagination">
+                    {% if pagedata.has_previous %}
+                  <li class="page-item ">
+                    <a class="page-link" href="{% url 'article' id pagedata.previous_page_number typeId %}" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% if pagedata.object_list %}
+                        {% for page in pagedata.paginator.page_range %}
+                            {% if page == pagedata.number %}
+                                <li class="page-item active" aria-current='page'>
+                                    <a class="page-link" href="{% url 'article' id page typeId%}">{{ page }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="{% url 'article' id page typeId %}">{{ page }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    {% if pagedata.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="{% url 'article' id pagedata.next_page_number typeId%}" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                    {% endif %}
+                </ul>
+            </nav>
+    </div>
+
+
+{% endblock %}
