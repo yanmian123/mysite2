@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "album",  # 添加相册应用
     "ckeditor",
     "ckeditor_uploader",
-    "concerns" # 添加关注应用
+    "concerns" # 添加关注应用.
 ]
 
 MIDDLEWARE = [
