@@ -63,22 +63,22 @@ MIDDLEWARE = [
 ROOT_URLCONF = "mysite2.urls"
 
 TEMPLATES = [
-        {
-        "BACKEND": "django.template.backends.jinja2.Jinja2",
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # 检查这里路径是否正确
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                "article.mycontext.getAllArticleType",  # 添加文章类别上下文处理器
-                "link.mycontext.getAllLink",  # 添加友情链接上下文处理器
-            ],
-            'environment': 'mysite2.jinja2_env.environment',  # 指定Jinja2环境
-        },
-    },
+    #     {
+    #     "BACKEND": "django.template.backends.jinja2.Jinja2",
+    #     'DIRS': [os.path.join(BASE_DIR, 'templates')],  # 检查这里路径是否正确
+    #     "APP_DIRS": True,
+    #     "OPTIONS": {
+    #         "context_processors": [
+    #             "django.template.context_processors.debug",
+    #             "django.template.context_processors.request",
+    #             "django.contrib.auth.context_processors.auth",
+    #             "django.contrib.messages.context_processors.messages",
+    #             "article.mycontext.getAllArticleType",  # 添加文章类别上下文处理器
+    #             "link.mycontext.getAllLink",  # 添加友情链接上下文处理器
+    #         ],
+    #         'environment': 'mysite2.jinja2_env.environment',  # 指定Jinja2环境
+    #     },
+    # },
     
     
     {
