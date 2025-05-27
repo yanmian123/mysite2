@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from .models import MyUser
 from django.contrib.auth import logout, login as auth_login, authenticate  # Import the logout, login, and authenticate functions
 from django.urls import reverse  # Import the reverse function
+from django_redis import get_redis_connection  # Import get_redis_connection for Redis operations
 
 
 # Create your views here.
@@ -50,22 +51,35 @@ def login(request):
     :param request:
     :return:
     """
+    errorInfo = ''
     username = request.POST.get('username', '')
     password = request.POST.get('password', '')
+    
+    
     if MyUser.objects.filter(username=username):
         user = authenticate(username=username, password=password)
         if user:
-            if user.is_active:
+            uuid = request.POST.get('uuid')
+            code = request.POST.get('code')
+            redis_conn = get_redis_connection('verify_code')
+            real_code = redis_conn.get(uuid)
+            if not real_code or code != real_code.decode():
+            # 验证码错误
+                 errorInfo='验证码错误'
+            elif user.is_active:
                 auth_login(request, user)
                 print("登录认证成功，跳转到博客主页")
                 kwargs={'id':request.user.id,'page':1,'typeId':0}
                 return redirect(reverse('article',kwargs=kwargs))
             else:
                 errorInfo = '用户已经被封禁！'
+
         else:
-            errorInfo = '用户名或者密码不存在！'
-    else:
-        errorInfo = '用户名不存在，请注册！'
+            errorInfo = '密码错误！'
+    elif username:
+        errorInfo = '用户名错误！'  
+
+
     return render(request, 'login.html', locals())
 
 def about(request,id):

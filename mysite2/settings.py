@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     "album",  # 添加相册应用
     "ckeditor",
     "ckeditor_uploader",
-    "concerns" # 添加关注应用.
+    "concerns", # 添加关注应用.
+    "verifications",  # 添加验证码应用
 ]
 
 MIDDLEWARE = [
@@ -125,8 +126,16 @@ CACHES = {
                 "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
+    },"verify_code":{#验证码
+                "BACKEND": "django_redis.cache.RedisCache",
+                "LOCATION": "redis://127.0.0.1:6379/2",  # 根据实际情况修改地址、端口、数据库编号
+                "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
+        
 }
+
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "c_session"  # 使用默认缓存配置

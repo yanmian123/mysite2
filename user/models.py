@@ -19,5 +19,9 @@ class MyUser(AbstractUser):
     address = models.CharField('地址',max_length=100, null=True, default='暂无')
     wx= models.CharField('微信',max_length=30, null=True, default='暂无')
     avatar = models.ImageField('头像',upload_to='avatar/',blank=True, null=True)
+    class Meta:
+        db_table = 't_Myuser_table'
+        verbose_name = '用户表'
+        verbose_name_plural=verbose_name
     def __str__(self):
         return self.name
