@@ -192,3 +192,5 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = 'user.MyUser'  # 设置自定义用户模型
+
+AUTHENTICATION_BACKENDS=['user.auth.MutiAccountLoginAuth']

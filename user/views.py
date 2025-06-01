@@ -4,7 +4,6 @@ from django.contrib.auth import logout, login as auth_login, authenticate  # Imp
 from django.urls import reverse  # Import the reverse function
 from django_redis import get_redis_connection  # Import get_redis_connection for Redis operations
 
-
 # Create your views here.
 def tologinpage(request):
     '''
@@ -59,6 +58,7 @@ def login(request):
         kwargs={'id':request.user.id,'page':1,'typeId':0}
         request.session.set_expiry(0)
         request.session['remember_me'] = remember_me == 'off'#只保持一次登录
+        logout(request)
         return redirect(reverse('article',kwargs=kwargs))
     errorInfo = ''
     username = request.POST.get('username', '')
@@ -67,7 +67,7 @@ def login(request):
 
     
     
-    if MyUser.objects.filter(username=username):
+    if MyUser.objects.filter(username=username) or MyUser.objects.filter(phone=username):
         user = authenticate(username=username, password=password)
         if user:
             uuid = request.POST.get('uuid')
@@ -94,6 +94,7 @@ def login(request):
     elif username:
         errorInfo = '用户名错误！'  
     
+
 
     return render(request, 'login.html', locals())
 
