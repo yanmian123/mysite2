@@ -2,14 +2,33 @@
 {% block title %}关于我{% endblock %}
 {% load static %}
 {% block content %}
+
 <div class="data_list">
+    {% if editing %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>昵称：<input type='text' name='name' value="{{aboutInfo.name}}"></div>
+            <p>公司：<input type='text' name='company' value="{{aboutInfo.company}}"></p>
+            <p>生日：<input type="date" name="birthday" value="{{ aboutInfo.birthday|date:'Y-m-d' }}"></p>
+            <p>微信：<input type="text" name="wx" value="{{ aboutInfo.wx }}"></p>
+            <p>联系电话：<input type="text" name="phone" value="{{ aboutInfo.phone }}"></p>
+            <p>住址：<input type="text" name="address" value="{{ aboutInfo.address }}"></p>
+        <p>头像：<input type="file" name="avatar"></p>
+        <div>
+        <button type="submit">保存<button>
+        <a href='{% url 'about' id=aboutInfo.id %}' >取消</a>
+        </div>
+    </form>
+    {% else %}
     <div>昵称：{{ aboutInfo.name }}</div>
-        <hr>
-            <div>公司：{{ aboutInfo.company }}</div>
-            <div>生日：{{ aboutInfo.birthday }}</div>
-        <hr>
-    <p>微信：{{ aboutInfo.wx }}</p>
-    <p>联系电话：{{ aboutInfo.phone }}</p>
-    <p>住址：{{ aboutInfo.address }}</p>
-</div>
+        <p>公司：{{ aboutInfo.company }}</p>
+        <p>生日：{{ aboutInfo.birthday }}</p>
+        <p>微信：{{ aboutInfo.wx }}</p>
+        <p>联系电话：{{ aboutInfo.phone }}</p>
+        <p>住址：{{ aboutInfo.address }}</p>
+        <p>头像：<img src="{{ aboutInfo.avatar.url }}" alt="Avatar" style="max-width: 200px;">
+        <a href="{% url 'about' id=aboutInfo.id %}?edit=true">编辑</a>
+    </div>
+    {%endif%}
+
 {% endblock %}

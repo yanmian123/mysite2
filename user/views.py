@@ -109,5 +109,23 @@ def about(request,id):
     if request.user.id != id:
         return redirect(reverse('tologinpage'))
     aboutInfo=MyUser.objects.filter(id=id).first()
-    print()
+
+    editing=request.GET.get('edit')=='true'
+
+    if request.method=='POST' and editing:
+        aboutInfo.name = request.POST.get('name', aboutInfo.name)
+        aboutInfo.company = request.POST.get('company', aboutInfo.company)
+        aboutInfo.birthday = request.POST.get('birthday', aboutInfo.birthday)
+        aboutInfo.wx = request.POST.get('wx', aboutInfo.wx)
+        aboutInfo.phone = request.POST.get('phone', aboutInfo.phone)
+        aboutInfo.address = request.POST.get('address', aboutInfo.address)
+        avatar = request.FILES.get('avatar')
+
+
+        if avatar:
+            aboutInfo.avatar = avatar
+        aboutInfo.save()
+        return redirect(reverse('about', kwargs={'id': id}))
     return render(request, 'about.html', locals())
+
+

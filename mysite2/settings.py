@@ -94,6 +94,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "article.mycontext.getAllArticleType",  # 添加文章类别上下文处理器
                 "link.mycontext.getAllLink",  # 添加友情链接上下文处理器
+                "article.mycontext.about_info"
             ],
         },
     },
