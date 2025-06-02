@@ -8,15 +8,22 @@ from article.models import ArticleType
 from .models import Article, MyUser,comment
 from .form import ArticleForm
 from django.contrib.auth.decorators import login_required
+from django_redis import get_redis_connection 
 
 # Create your views here.
 
-    
+@login_required(login_url='tologinpage')
 def article(request,id,page,typeId):
     '''
     查询帖子信息
     '''
-    
+    # redis_conn = get_redis_connection('c_session')
+    # id2=request.user.id
+    # print(id2)
+    # if id2 != id:
+    #     return redirect(reverse('toregisterpage'))
+    if request.user.id != id:
+        return redirect(reverse('tologinpage'))
     user=MyUser.objects.filter(id=id).first()
     if user==None:
         return redirect(reverse('toregisterpage'))
@@ -36,7 +43,7 @@ def article(request,id,page,typeId):
         pagedata=paginator.page(paginator.num_pages)
     return render(request,'article.html',locals())#作用是把当前作用域里的所有局部变量传递给 render 函数
                                                   #。render 函数会将这些变量作为上下文传递给 article.html 模板，这样在模板文件里就能使用这些变量了。
-                                                  
+@login_required(login_url='tologinpage')                                                 
 def articledetail(request,id,aid):
     '''
     查询帖子详情
@@ -44,6 +51,8 @@ def articledetail(request,id,aid):
     :param id: 用户id       
     :param aid: 某个帖子的id
     '''    
+    if request.user.id != id:
+        return redirect(reverse('tologinpage'))
     if request.method=='GET':
         user=MyUser.objects.filter(id=id).first()
         article=Article.objects.filter(id=aid).first() # 查询帖子

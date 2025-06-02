@@ -3,11 +3,16 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from .models import message
 from django.utils import timezone
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+@login_required(login_url='tologinpage') 
+
 def message2(request,id,page):
     '''
     留言信息查询添加
     '''
+    if request.user.id != id:
+        return redirect(reverse('tologinpage'))
     pagesize=10 # 每页显示的留言数
     messagelist=message.objects.filter(user_id=id) # 查询所有留言
     paginator=Paginator(messagelist,pagesize) # 分页器

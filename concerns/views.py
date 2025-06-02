@@ -5,14 +5,18 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.urls import reverse
 from user.models import MyUser
 from .models import  Myconcerns
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 from django.core.paginator import Paginator
+@login_required(login_url='tologinpage') 
 
 def concerns(request, id,page):
     '''
     关注列表
     '''
+    if request.user.id != id:
+        return redirect(reverse('tologinpage'))
     user = MyUser.objects.filter(id=id).first()  # 获取当前用户
     concern_list = Myconcerns.objects.filter(user=user).order_by('-create_time')  # 获取用户关注的所有用户
     paginator = Paginator(concern_list, 10)  # 每页显示 10 条数据

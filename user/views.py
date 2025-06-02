@@ -3,6 +3,7 @@ from .models import MyUser
 from django.contrib.auth import logout, login as auth_login, authenticate  # Import the logout, login, and authenticate functions
 from django.urls import reverse  # Import the reverse function
 from django_redis import get_redis_connection  # Import get_redis_connection for Redis operations
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def tologinpage(request):
@@ -98,12 +99,15 @@ def login(request):
 
     return render(request, 'login.html', locals())
 
+@login_required(login_url='tologinpage') 
 def about(request,id):
     """
     关于我们
     :param request:
     :return:
     """
+    if request.user.id != id:
+        return redirect(reverse('tologinpage'))
     aboutInfo=MyUser.objects.filter(id=id).first()
     print()
     return render(request, 'about.html', locals())
