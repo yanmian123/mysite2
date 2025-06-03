@@ -43,7 +43,7 @@
             <div class="col-md-12" style="padding-top: 10px; padding-bottom: 10px;">
                 <nav class="navbar navbar-expand-lg navbar-light bg-light">
                     <div class="container-fluid">
-                        <a class="navbar-brand" href="{% url 'article' id 1 0 %}">博客首页</a>
+                        <a class="navbar-brand" href="{% url 'article' request.user.id 1 0 %}">博客首页</a>
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                             aria-expanded="false" aria-label="Toggle navigation">
@@ -52,13 +52,13 @@
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'album' id 1%}">我的相册</a>
+                                    <a class="nav-link" href="{% url 'album' request.user.id 1%}">我的相册</a>
                                 </li> 
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'about' id %}">关于我</a>
+                                    <a class="nav-link" href="{% url 'about' request.user.id %}">关于我</a>
                                 </li> 
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'message2' id 1 %}">留言</a>
+                                    <a class="nav-link" href="{% url 'message2' request.user.id 1 %}">留言</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'admin:index' %}">博客后台管理</a>
@@ -67,10 +67,7 @@
                                     <a class="nav-link" href="{% url 'article_create' %}">发布博客</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'concerns' id 1%}">关注</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'concerns' id 1%}">关注</a>
+                                    <a class="nav-link" href="{% url 'concerns' request.user.id 1%}">关注</a>
                                 </li>
                             </ul>
 
@@ -82,7 +79,7 @@
                               </svg>
 
 
-                              <form id="search-form" method="post" action="{% url 'searchuser' id 1 %}"
+                              <form id="search-form" method="post" action="{% url 'searchuser' request.user.id 1 %}"
                               onsubmit="return checkSearchForm2()">
                               {% csrf_token%}
                                 <div class="form-floating">
@@ -92,7 +89,7 @@
                                   <button class="btn btn-success" type="submit">Search</button> <!-- 按钮颜色改为绿色 -->
                             </form>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <form class="d-flex" role="search" method="post" action="{% url 'search' id 1 %}"
+                            <form class="d-flex" role="search" method="post" action="{% url 'search' request.user.id 1 %}"
                                 onsubmit="return checkSearchForm()">
                                 {% csrf_token %}
                                 <input class="form-control me-2" type="search" placeholder="请输入搜索内容..." 
@@ -126,8 +123,8 @@
                         <img src="{{ aboutInfo.avatar.url }}" class="rounded-circle mb-2"
                             style="width: 100px; height: 100px;">
                     </div>
-                    <div class="nickName text-center">{{ user.name }}</div>
-                    <div class="userSign text-center">({{ user.company }})</div>
+                    <div class="nickName text-center">{{ request.user.name }}</div>
+                    <div class="userSign text-center">({{ request.user.company }})</div>
                 </div>
                 <!-- 日志类别模块 -->
                 <div class="data_list border rounded p-3 mb-3">
@@ -139,7 +136,7 @@
                     <div class="datas">
                         <ul class="list-unstyled">
                             {% for type in articleTypelist%}
-                            <li><span><a href={%url 'article' id 1 type.id %}>{{ type.name}}</a></span></li>
+                            <li><span><a href={%url 'article' request.user.id 1 type.id %}>{{ type.name}}</a></span></li>
                             {% endfor %} 
                         </ul>
                     </div>

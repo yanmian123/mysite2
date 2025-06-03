@@ -1,16 +1,17 @@
 
+from django.utils import timezone  
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.urls import reverse
 from user.models import MyUser
 from .models import  Myconcerns
+from article.models import Article
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 from django.core.paginator import Paginator
 @login_required(login_url='tologinpage') 
-
 def concerns(request, id,page):
     '''
     关注列表
@@ -25,7 +26,7 @@ def concerns(request, id,page):
     except PageNotAnInteger:
         concern2 = paginator.page(1)
     except EmptyPage:
-        concern2 = paginator.page(paginator.num_pages)
+        concern2 = paginator.page(paginator.num_pages) 
     
     return render(request, 'concerns.html', {'concern2': concern2, 'id': id,'page':page})  # 渲染模板，传入关注列表和当前用户 ID
 
@@ -63,3 +64,72 @@ def searchuser(request,id,page):
         'page': page
     }
     return render(request,'searchuser.html',context)  # 渲染模板，传入搜索结果和当前用户 ID
+
+def concernspersonhome(request,id,page,typeId):
+    user=MyUser.objects.filter(id=id).first()
+    pagesize=3 # 每页显示的帖子数
+    print(id,page,typeId)
+    if typeId==None or typeId==0:
+        articlelist=Article.objects.filter(author_id=id).order_by('-create_time') # 查询所有帖子
+    else:
+        articlelist=Article.objects.filter(author_id=id,type_id=typeId).order_by('-create_time') # 查询指定类型的帖子
+    paginator=Paginator(articlelist,pagesize) # 分页器
+    try:
+        pagedata=paginator.page(page) # 获取当前页的数据
+    except PageNotAnInteger:# 如果页码不是整数，返回第一页
+        pagedata=paginator.page(1)
+    except EmptyPage:# 如果页码超过范围，返回最后一页   
+        pagedata=paginator.page(paginator.num_pages)
+    return render(request,"concernspersonhome.html",locals())
+    
+# @login_required(login_url='tologinpage') 
+# def concernuser(request,concern_id,user_id,concern_name):
+#     '点击关注之后，把关注对象加入到数据库'
+#     value={
+#         'id':concern_id,
+#         'user':user_id,
+#         'concern_user':concern_name,
+#         'create_time':timezone.now(),
+        
+#     }
+#     Myconcerns.objects.create(**value)############################把关注的对象加入数据库
+#     if request.user.id != id:
+#         return redirect(reverse('tologinpage'))
+#     kwargs={'id':user_id,'page':0}
+#     return redirect(reverse('serchuser',kwargs=kwargs))
+
+# @login_required(login_url='tologinpage')
+# def concernuser(request, concern_id, user_id):
+#     try:
+#         user = MyUser.objects.get(id=user_id)
+#         concern_user = MyUser.objects.get(id=concern_id)
+#         # 检查是否已经关注
+#         if not Myconcerns.objects.filter(user=user, concern_user=concern_user).exists():
+#             Myconcerns.objects.create(
+#                 user=user,
+#                 concern_user=concern_user,
+#                 create_time=timezone.now()
+#             )
+#     except MyUser.DoesNotExist:
+#         pass
+#     kwargs = {'id': user_id, 'page': 1}
+#     return redirect(reverse('searchuser', kwargs=kwargs))
+from django.views.decorators.csrf import csrf_exempt
+@login_required(login_url='tologinpage')
+@csrf_exempt
+def concernuser(request, concern_id, user_id):
+    try:
+        user = MyUser.objects.get(id=user_id)
+        concern_user = MyUser.objects.get(id=concern_id)
+        # 检查是否已经关注
+        if not Myconcerns.objects.filter(user=user, concern_user=concern_user).exists():
+            Myconcerns.objects.create(
+                user=user,
+                concern_user=concern_user,
+                create_time=timezone.now()
+            )
+        return JsonResponse({'success': True})
+    except MyUser.DoesNotExist:
+        return JsonResponse({'success': False, 'message': '用户不存在'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})

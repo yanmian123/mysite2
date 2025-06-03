@@ -17,11 +17,6 @@ def article(request,id,page,typeId):
     '''
     查询帖子信息
     '''
-    # redis_conn = get_redis_connection('c_session')
-    # id2=request.user.id
-    # print(id2)
-    # if id2 != id:
-    #     return redirect(reverse('toregisterpage'))
     if request.user.id != id:
         return redirect(reverse('tologinpage'))
     user=MyUser.objects.filter(id=id).first()
@@ -61,13 +56,12 @@ def articledetail(request,id,aid):
             return HttpResponse("没有该帖子")
         articlecomment = comment.objects.filter(article_id=aid, parent_comment__isnull=True).order_by('-create_time')
         return render(request,'articledetail.html',locals()) # locals() 函数会返回当前作用域里的所有局部变量，作用是把这些变量传递给 render 函数。
-    else:
-        # user=request.POST.get('user')
+    else:###这里是发表评论时的POST请求处理
         user=MyUser.objects.filter(id=id).first()
         content=request.POST.get('content')
     # 检查 content 是否为空
         if not content:
-            return HttpResponse("评论内容不能为空")
+            return HttpResponse("评论内容不能为空1111")
         article = Article.objects.get(id=aid)
         parent_comment_id = request.POST.get('parent_comment_id')
         if parent_comment_id:
@@ -114,7 +108,7 @@ def commentreply(request, comment_id, aid):
             return HttpResponse("评论不存在")
         content = request.POST.get('content')
         if not content:
-            return HttpResponse("评论内容不能为空")
+            return HttpResponse("评论内容不能为空111")
         user = MyUser.objects.filter(id=request.user.id).first()
         comment2 = comment.objects.create(
             content=content,

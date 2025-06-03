@@ -3,13 +3,16 @@
 {% block title %}搜索结果 - {{ uservalue }}{% endblock %}
 {% block content %}
     <h2>搜索结果：{{ uservalue }}</h2>
-    {% if userlist %}
+    {% if userlist %}  
         <ul>
             {% for user3 in userlist %}
                 <li>
-                    <a href="{% url 'article' user3.id 1 0  %}">{{ user3.name}}<button type="button" class="btn "  style="background-color: var(--bs-warning-bg-subtle); --bs-border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text);float: right;">关注</button></a>
-                    <p>{{ user3.name|truncatewords:20 }}</p>
-                    {% comment %} <div class="px-3 py-2 rounded-2 border" style="background-color: var(--bs-warning-bg-subtle); --bs-border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text);">Background subtle</div> {% endcomment %}
+                    {% comment %} <a href="{% url 'concernuser' user3.id request.user.id %}">{{ user3.name}}<button type="button" class="btn "  style="background-color: var(--bs-warning-bg-subtle); --bs-border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text);float: right;">关注</button></a>
+                    <p>{{ user3.name|truncatewords:20 }}</p> {% endcomment %}
+                                        <a href="#" data-concern-id="{{ user3.id }}" data-user-id="{{ request.user.id }}" class="concern-button">
+                        {{ user3.name }}
+                        <button type="button" class="btn" style="background-color: var(--bs-warning-bg-subtle); --bs-border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text);float: right;">关注</button>
+                    </a>
                 </li>
             {% endfor %}
         </ul>

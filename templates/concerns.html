@@ -4,12 +4,12 @@
 {% for concernusers in concern2 %}
 <ul style="background: url({% static "images/hui.png" %}) no-repeat top 5px left 10px;">
     <p style="padding-top: 5px;">
-        {{ concernusers.user }}：
+        {% comment %} {{ concernusers.user }}： {% endcomment %}
 
     </p>
-    <p>
+    <p> 
       <li>
-        <a href="{% url 'article' concernusers.concern_user.id 1 0 %}">{{ concernusers.concern_user }}</a>
+        <a href="{% url 'concernspersonhome' concernusers.concern_user.id 1 0 %}">{{ concernusers.concern_user }}</a>
     </li>
       <span class="msgtime" style="float: right;">{{ concernusers.create_time|date:"Y-m-d_H:m" }}</span>
     </p>
