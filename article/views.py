@@ -26,7 +26,7 @@ def article(request,id,page,typeId):
     
     print(id,page,typeId)
     if typeId==None or typeId==0:
-        articlelist=Article.objects.filter(author_id=id).order_by('-create_time') # 查询所有帖子
+        articlelist=Article.objects.select_related('author', 'type').filter(author_id=id).order_by('-create_time') # 查询所有帖子
     else:
         articlelist=Article.objects.filter(author_id=id,type_id=typeId).order_by('-create_time') # 查询指定类型的帖子
     paginator=Paginator(articlelist,pagesize) # 分页器

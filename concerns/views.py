@@ -19,7 +19,7 @@ def concerns(request, id,page):
     if request.user.id != id:
         return redirect(reverse('tologinpage'))
     user = MyUser.objects.filter(id=id).first()  # 获取当前用户
-    concern_list = Myconcerns.objects.filter(user=user).order_by('-create_time')  # 获取用户关注的所有用户
+    concern_list = Myconcerns.objects.select_related('concern_user').filter(user=user).order_by('-create_time')  # 获取用户关注的所有用户
     paginator = Paginator(concern_list, 10)  # 每页显示 10 条数据
     try:
         concern2 = paginator.page(page)
@@ -41,7 +41,7 @@ def searchuser(request,id,page):
     
     keyword=request.POST.get('uservalue') or request.GET.get('uservalue')# 获取搜索关键字
     if keyword:
-        userlist = MyUser.objects.filter(
+        userlist = MyUser.objects.select_related('profile').filter(
             Q(name__icontains=keyword) | Q(wx__icontains=keyword)
         ).order_by('-id')
     else:
