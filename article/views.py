@@ -9,6 +9,8 @@ from .models import Article, MyUser,comment
 from .form import ArticleForm
 from django.contrib.auth.decorators import login_required
 from django_redis import get_redis_connection 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 # Create your views here.
 
@@ -26,7 +28,7 @@ def article(request,id,page,typeId):
     
     print(id,page,typeId)
     if typeId==None or typeId==0:
-        articlelist=Article.objects.select_related('author', 'type').filter(author_id=id).order_by('-create_time') # 查询所有帖子
+        articlelist=Article.objects.filter(author_id=id).order_by('-create_time') # 查询所有帖子
     else:
         articlelist=Article.objects.filter(author_id=id,type_id=typeId).order_by('-create_time') # 查询指定类型的帖子
     paginator=Paginator(articlelist,pagesize) # 分页器
@@ -61,30 +63,41 @@ def articledetail(request,id,aid):
         content=request.POST.get('content')
     # 检查 content 是否为空
         if not content:
-            return HttpResponse("评论内容不能为空1111")
+            return HttpResponse("评论内容不能为空")
         article = Article.objects.get(id=aid)
         parent_comment_id = request.POST.get('parent_comment_id')
+         # 创建评论
         if parent_comment_id:
             parent_comment = comment.objects.get(id=parent_comment_id)
-            value = {
-                'user': user,
-                'content': content,
-                'author_id': id,
-                'article_id': aid,
-                'create_time': timezone.now(),
-                'parent_comment': parent_comment
-            }
+            new_comment = comment.objects.create(
+                user=user,
+                content=content,
+                author_id=id,
+                article=article,
+                parent_comment=parent_comment
+            )
         else:
-            value = {
-                'user': user,
+            new_comment = comment.objects.create(
+                user=user,
+                content=content,
+                author_id=id,
+                article=article
+            )
+        
+        # 触发WebSocket通知
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'article_{aid}',
+            {
+                'type': 'new_comment',
                 'content': content,
-                'author_id': id,
-                'article_id': aid,
-                'create_time': timezone.now()
+                'user': user.username,  # 或user.nickname根据您的用户模型
+                'comment_id': new_comment.id,
+                'parent_comment_id': parent_comment_id
             }
-        comment.objects.create(**value)
-        kwargs = {'id': id, 'aid': aid}
-        return redirect(reverse('articledetail', kwargs=kwargs))
+        )
+        
+        return redirect(reverse('articledetail', kwargs={'id': id, 'aid': aid}))
     
     
 
@@ -113,24 +126,36 @@ def commentreply(request, comment_id, aid):
         comment2 = comment.objects.create(
             content=content,
             article_id=aid,
-            author_id=commentauthor,
+            author_id=request.user.id,
             create_time=timezone.now(),
             user=user,
             parent_comment=comment1
         )
-        kwargs = {'id': request.user.id, 'aid': aid}
-        return redirect(reverse('articledetail', kwargs=kwargs))
+        
+                # 触发WebSocket通知
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'article_{aid}',
+            {
+                'type': 'new_comment',
+                'content': content,
+                'user': user.username,
+                'comment_id': comment2.id,
+                'parent_comment_id': comment_id
+            }
+        )
+        return redirect(reverse('articledetail', kwargs={'id': request.user.id, 'aid': aid}))
 
 
-def create_article(request):
-    if request.method == 'POST':
-        form = ArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('article_list')
-    else:
-        form = ArticleForm()
-    return render(request, 'article_create.html', {'form': form})
+# def create_article(request):
+#     if request.method == 'POST':
+#         form = ArticleForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('article_list')
+#     else:
+#         form = ArticleForm()
+#     return render(request, 'article_create.html', {'form': form})
 
 
 from django.db.models import Q

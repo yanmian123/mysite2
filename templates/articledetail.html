@@ -22,7 +22,7 @@
             <h2 class="mb-4">评论区</h2>
 
             <!-- 评论输入区域，使用表单 -->
-            <form action="" method="post" onsubmit="return checkForm()">
+            <form id="commentForm" onsubmit="return submitComment(event)"><!-- 绑定自定义提交函数 -->
                 {% csrf_token%}
                 <div class="mb-3">
                     <label for="commentInput" class="form-label">发表评论</label>
@@ -113,5 +113,142 @@
             }
             return true;
         }
+
+
+// 新增：异步提交评论到WebSocket
+function submitComment(event) {
+    event.preventDefault(); // 阻止表单默认提交（关键：避免页面刷新）
+    console.log("提交评论函数被调用"); // 增加调试日志
+    const content = document.getElementById('commentInput').value.trim();
+    
+    // 验证内容不为空
+    if (!content) {
+        alert("评论内容不能为空！");
+        return false;
+    }
+    
+    console.log("WebSocket状态:", window.socket?.readyState); // 检查连接状态
+
+    // 通过WebSocket发送评论
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            'type': 'new_comment',  // 与后端receive方法中的类型匹配
+            'content': content,
+            'user': currentUser  // 当前登录用户（从模板变量获取）
+            // 不需要传comment_id：由后端数据库生成
+        }));
+        
+        // 清空输入框
+        document.getElementById('commentInput').value = '';
+    } else {
+        alert("WebSocket连接未建立，请刷新页面重试");
+    }
+    return false;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    //const articleId = {{ article.id }};
+    //const currentUser = "{{ request.user.username }}";
+    // 声明为全局变量
+    window.articleId = {{ article.id }};
+    window.currentUser = "{{ request.user.username }}";
+    
+    // 建立WebSocket连接
+    const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const wsPath = wsScheme + '://' + window.location.host + '/ws/article/' + articleId + '/';
+    //const socket = new WebSocket(wsPath);
+    window.socket = new WebSocket(wsPath); 
+    window.socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if (data.type === 'comment') {
+            addCommentToPage(data);
+        }
+    };
+
+
+function submitReply(parentCommentId) {
+    const content = document.querySelector(`#replyForm_${parentCommentId} textarea`).value.trim();
+    if (!content) {
+        alert("回复内容不能为空！");
+        return;
+    }
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            'type': 'new_reply',
+            'content': content,
+            'user': currentUser,
+            'parent_comment_id': parentCommentId
+        }));
+        // 清空输入框并隐藏
+        document.querySelector(`#replyForm_${parentCommentId} textarea`).value = '';
+        hideReplyInput(parentCommentId);
+    } else {
+        alert("WebSocket连接未建立，请刷新页面重试");
+    }
+}
+
+
+function addCommentToPage(data) {
+    // 1. 创建评论DOM元素
+    const commentElement = document.createElement('div');
+    commentElement.classList.add('media', 'mb-3');  // 复用现有评论样式
+    commentElement.dataset.commentId = data.comment_id;  // 存储评论ID用于回复
+    
+    // 2. 填充评论内容（使用从后端接收的真实数据）
+    commentElement.innerHTML = `
+        <img src="https://picsum.photos/50/50" class="rounded-circle me-3" alt="用户头像">
+        <div class="media-body">
+            <h5 class="mt-0">${data.user}</h5>  <!-- 评论用户 -->
+            <p>${data.content}</p>  <!-- 评论内容 -->
+            <small class="text-muted">刚刚</small>  <!-- 时间显示 -->
+        </div>
+    `;
+    
+    // 3. 添加回复和删除按钮（复用现有逻辑）
+    const actionButtons = document.createElement('div');
+    actionButtons.innerHTML = `
+        <button type="button" class="btn btn-sm" onclick="showReplyInput(${data.comment_id})">回复</button>
+        <button type="button" class="btn btn-sm" onclick="toggleReplies(${data.comment_id})">查看回复</button>
+        ${currentUser === data.user ?  // 仅作者可删除
+            `<form action="/article/commentdelete/${data.comment_id}/" method="post" class="position bottom-0 end-0" style="margin-left: 90%;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm">删除</button>
+            </form>` : ''
+        }
+        <!-- 回复输入框（改为异步提交） -->
+        <div class="position bottom-0 end-0" style="margin-left: 70%; display: none;" id="replyForm_${data.comment_id}">
+            {% csrf_token %}
+            <input type="hidden" name="parent_comment_id" value="${data.comment_id}">
+            <div class="mb-3">
+                <textarea class="form-control" name="content" rows="2" placeholder="回复 ${data.user}..."></textarea>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="submitReply(${data.comment_id})">提交回复</button>
+            <button type="button" class="btn btn-sm" onclick="hideReplyInput(${data.comment_id})">取消</button>
+        </div>
+        <!-- 回复列表容器 -->
+        <div id="replies_${data.comment_id}" style="display: none;"></div>
+    `;
+    
+    // 4. 将按钮追加到评论元素后
+    commentElement.appendChild(actionButtons);
+    
+    // 5. 插入到评论列表最上方（或最下方）
+    const commentsContainer = document.querySelector('.card-body');  // 评论容器
+    if (commentsContainer) {
+        // 在现有评论前插入新评论
+        commentsContainer.insertBefore(commentElement, commentsContainer.firstChild);
+    } else {
+        console.error("未找到评论容器，请检查DOM结构");
+    }
+}
+    
+    function createRepliesContainer(parentComment) {
+        const container = document.createElement('div');
+        container.classList.add('replies');
+        parentComment.appendChild(container);
+        return container;
+    }
+});
     </script>
 {% endblock %}

@@ -19,7 +19,7 @@ def concerns(request, id,page):
     if request.user.id != id:
         return redirect(reverse('tologinpage'))
     user = MyUser.objects.filter(id=id).first()  # 获取当前用户
-    concern_list = Myconcerns.objects.select_related('concern_user').filter(user=user).order_by('-create_time')  # 获取用户关注的所有用户
+    concern_list = Myconcerns.objects.filter(user=user).order_by('-create_time')  # 获取用户关注的所有用户
     paginator = Paginator(concern_list, 10)  # 每页显示 10 条数据
     try:
         concern2 = paginator.page(page)
@@ -41,7 +41,7 @@ def searchuser(request,id,page):
     
     keyword=request.POST.get('uservalue') or request.GET.get('uservalue')# 获取搜索关键字
     if keyword:
-        userlist = MyUser.objects.select_related('profile').filter(
+        userlist = MyUser.objects.filter(
             Q(name__icontains=keyword) | Q(wx__icontains=keyword)
         ).order_by('-id')
     else:
@@ -121,14 +121,21 @@ def concernuser(request, concern_id, user_id):
     try:
         user = MyUser.objects.get(id=user_id)
         concern_user = MyUser.objects.get(id=concern_id)
+
         # 检查是否已经关注
-        if not Myconcerns.objects.filter(user=user, concern_user=concern_user).exists():
+        existing_concern = Myconcerns.objects.filter(user=user, concern_user=concern_user).first()
+        if existing_concern:
+            # 如果已关注，则取关
+            existing_concern.delete()
+            return JsonResponse({'success': True, 'action': 'unfollow'})
+        else:
+            # 如果未关注，则添加关注
             Myconcerns.objects.create(
                 user=user,
                 concern_user=concern_user,
                 create_time=timezone.now()
             )
-        return JsonResponse({'success': True})
+            return JsonResponse({'success': True, 'action': 'follow'})
     except MyUser.DoesNotExist:
         return JsonResponse({'success': False, 'message': '用户不存在'})
     except Exception as e:

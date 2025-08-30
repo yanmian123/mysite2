@@ -2,6 +2,11 @@
 {% extends "base.html" %}
 {% block title %}搜索结果 - {{ uservalue }}{% endblock %}
 {% block content %}
+<body>
+    <form method="post">
+        {% csrf_token %}
+    </form>
+    <!-- 其他内容 -->
     <h2>搜索结果：{{ uservalue }}</h2>
     {% if userlist %}  
         <ul>
@@ -9,9 +14,11 @@
                 <li>
                     {% comment %} <a href="{% url 'concernuser' user3.id request.user.id %}">{{ user3.name}}<button type="button" class="btn "  style="background-color: var(--bs-warning-bg-subtle); --bs-border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text);float: right;">关注</button></a>
                     <p>{{ user3.name|truncatewords:20 }}</p> {% endcomment %}
-                                        <a href="#" data-concern-id="{{ user3.id }}" data-user-id="{{ request.user.id }}" class="concern-button">
-                        {{ user3.name }}
-                        <button type="button" class="btn" style="background-color: var(--bs-warning-bg-subtle); --bs-border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text);float: right;">关注</button>
+                    <a href="#" data-concern-id="{{ user.id }}" data-user-id="{{ request.user.id }}" class="concern-button">
+                        {{ user.name }}
+                        <button type="button" class="btn {% if user in current_user_concerns %}btn-success{% else %}btn-warning{% endif %}">
+                            {% if user in current_user_concerns %}已关注{% else %}关注{% endif %}
+                        </button>
                     </a>
                 </li>
             {% endfor %}
@@ -19,6 +26,7 @@
     {% else %}
         <p>未找到相关结果。</p>
     {% endif %}
+    </body>
     <nav aria-label="Page navigation example" class="d-flex justify-content-center">
         <ul class="pagination">
             {% if searchuser2.has_previous %}
@@ -48,4 +56,57 @@
             {% endif %}
         </ul>
     </nav>
+
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function () {
+    const concernButtons = document.querySelectorAll('.concern-button');
+    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    concernButtons.forEach(function (button) {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            const concernId = this.dataset.concernId; // 获取关注用户的 ID
+            const userId = this.dataset.userId; // 获取当前用户的 ID
+            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+            // 发起异步请求
+            fetch(`/concernuser/${concernId}/${userId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    concern_id: concernId,
+                    user_id: userId
+                })
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                if (data.success) {
+                    if (data.action === 'follow') {
+                        // 更新按钮状态为“已关注”
+                        button.textContent = '已关注';
+                        button.classList.add('btn-success');
+                        button.classList.remove('btn-warning');
+                    } else if (data.action === 'unfollow') {
+                        // 更新按钮状态为“关注”
+                        button.textContent = '关注';
+                        button.classList.add('btn-warning');
+                        button.classList.remove('btn-success');
+                    }
+                } else {
+                    alert(data.message || '操作失败，请稍后再试');
+                }
+            })
+            .catch(function (error) {
+                console.error('Error:', error);
+                alert('发生错误，请稍后再试');
+            });
+        });
+    });
+});
+</script>
 {% endblock %}
