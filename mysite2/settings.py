@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "ckeditor",
     "ckeditor_uploader",
     "concerns", # 添加关注应用.
-    "verifications",  # 添加验证码应用
+    # "verifications",  # 添加验证码应用
     'channels',#用于websocket
 ]
 
@@ -86,24 +86,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "mysite2.urls"
 
 TEMPLATES = [
-    #     {
-    #     "BACKEND": "django.template.backends.jinja2.Jinja2",
-    #     'DIRS': [os.path.join(BASE_DIR, 'templates')],  # 检查这里路径是否正确
-    #     "APP_DIRS": True,
-    #     "OPTIONS": {
-    #         "context_processors": [
-    #             "django.template.context_processors.debug",
-    #             "django.template.context_processors.request",
-    #             "django.contrib.auth.context_processors.auth",
-    #             "django.contrib.messages.context_processors.messages",
-    #             "article.mycontext.getAllArticleType",  # 添加文章类别上下文处理器
-    #             "link.mycontext.getAllLink",  # 添加友情链接上下文处理器
-    #         ],
-    #         'environment': 'mysite2.jinja2_env.environment',  # 指定Jinja2环境
-    #     },
-    # },
-    
-    
+
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         'DIRS': [os.path.join(BASE_DIR, 'templates')],  # 检查这里路径是否正确
@@ -128,35 +111,80 @@ WSGI_APPLICATION = "mysite2.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "mysiteblog",
+#         'USER':'root',
+#         'PASSWORD':'123456',
+#         'HOST':'localhost',
+#         'PORT':'3306',
+#     }
+# }
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "mysiteblog",
-        'USER':'root',
-        'PASSWORD':'123456',
-        'HOST':'localhost',
-        'PORT':'3306',
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('MYSQL_DATABASE', 'mysiteblog'),
+        'USER': os.getenv('MYSQL_USER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', '123456'),
+        'HOST': os.getenv('DB_HOST', 'db'),  # 使用环境变量
+        'PORT': os.getenv('DB_PORT', '3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
 
+
+# # Redis 配置
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+
+# # 缓存配置
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": REDIS_URL,
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
 
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         },"c_session":{
                 "BACKEND": "django_redis.cache.RedisCache",
-                "LOCATION": "redis://127.0.0.1:6379/1",  # 根据实际情况修改地址、端口、数据库编号
+                "LOCATION": "redis://redis:6379/1",  # 根据实际情况修改地址、端口、数据库编号
                 "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
-    },"verify_code":{#验证码
-                "BACKEND": "django_redis.cache.RedisCache",
-                "LOCATION": "redis://127.0.0.1:6379/2",  # 根据实际情况修改地址、端口、数据库编号
-                "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
+                                            # },"verify_code":{#验证码
+                                            #             "BACKEND": "django_redis.cache.RedisCache",
+                                            #             "LOCATION": "redis://127.0.0.1:6379/2",  # 根据实际情况修改地址、端口、数据库编号
+                                            #             "OPTIONS": {
+                                            #             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                                            #     }
     }
         
+}
+
+
+# Channel Layers 配置
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     },
+# }
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],  # 使用服务名
+        },
+    },
 }
 
 
@@ -217,3 +245,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = 'user.MyUser'  # 设置自定义用户模型
 
 AUTHENTICATION_BACKENDS=['user.auth.MutiAccountLoginAuth']
+

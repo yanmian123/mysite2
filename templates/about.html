@@ -26,7 +26,9 @@
         <p>微信：{{ aboutInfo.wx }}</p>
         <p>联系电话：{{ aboutInfo.phone }}</p>
         <p>住址：{{ aboutInfo.address }}</p>
+        {% if aboutInfo.avatar.url %}
         <p>头像：<img src="{{ aboutInfo.avatar.url }}" alt="Avatar" style="max-width: 200px;">
+        {% endif %}
         <a href="{% url 'about' id=aboutInfo.id %}?edit=true">编辑</a>
     </div>
     {%endif%}

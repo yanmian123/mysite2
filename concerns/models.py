@@ -1,11 +1,16 @@
+# concerns/models.py
 from django.db import models
+from user.models import MyUser
 
-# Create your models here.
-class Myconcerns(models.Model):
-    """
-    关注实体
-    """
-    id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('user.MyUser', on_delete=models.CASCADE, verbose_name="用户")
-    concern_user = models.ForeignKey('user.MyUser', on_delete=models.CASCADE, related_name='concerned_user', verbose_name="关注的用户")
-    create_time = models.DateTimeField(auto_now_add=True, verbose_name="关注时间")
+class Concern(models.Model):
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='concerned_by')
+    concern_user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='concerned_users')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'concern_user')
+        verbose_name = '关注关系'
+        verbose_name_plural = '关注关系'
+        
+    def __str__(self):
+        return f"{self.user.username} 关注 {self.concern_user.username}"

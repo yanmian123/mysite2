@@ -41,14 +41,14 @@
                 <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码"
                     value="{{ password }}">
             </div>
-<div class="mb-3">
+{% comment %} <div class="mb-3">
     <label for="code" class="form-label">验证码</label>
     <div class="input-group">
         <input type="text" class="form-control" id="code" name="code" placeholder="请输入验证码">
         <input type="hidden" id="uuid" name="uuid">
         <img id="imgcode" src="" alt="验证码" style="cursor:pointer;margin-left:10px;height:38px;" title="看不清？点击换一张">
     </div>
-</div>                
+</div>                 {% endcomment %}
             <div>
                     <input type="checkbox" id="remember_me" name="remember_me" {% if remember_me %}checked{% endif %}>
                     <label for="remember_me" class="label-text">记住密码<label>
@@ -66,7 +66,7 @@
     <script type="text/javascript">
 
             // 生成uuid
-    function generateUUID() {
+    {% comment %} function generateUUID() {
         let d = new Date().getTime();
         if (window.performance && typeof window.performance.now === "function") {
             d += performance.now();
@@ -90,7 +90,7 @@
         refreshImgCode();
         document.getElementById('imgcode').onclick = refreshImgCode;
     };
-
+ {% endcomment %}
 
         function checkForm() {
             var username = document.getElementById('username').value;

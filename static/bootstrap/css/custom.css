@@ -1,0 +1,57 @@
+/* 整体页面背景色 */
+body {
+    background-color: #f4f4f4;
+}
+
+/* 导航栏背景色和文字颜色 */
+.navbar-light {
+    background-color: #ffffff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-light.navbar-brand,
+.navbar-light.navbar-nav.nav-link {
+    color: #333;
+}
+
+.navbar-light.navbar-nav.nav-link:hover {
+    color: #007bff;
+}
+
+/* 表单按钮样式 */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* 数据列表样式 */
+.data_list {
+    background-color: #ffffff;
+}
+
+.data_list_title {
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 5px;
+}
+
+/* 列表无样式 */
+.list-unstyled {
+    padding-left: 0;
+    list-style: none;
+}
+
+.navbar-light {
+    display: flex;
+    justify-content: space-between;
+}
+.navbar-light .navbar-nav {
+    order: 1;
+}
+.navbar-light form {
+    order: 2;
+}

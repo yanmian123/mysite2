@@ -2,19 +2,18 @@
 {% load static %}
 {% block content %}
 {% for concernusers in concern2 %}
-<ul style="background: url({% static "images/hui.png" %}) no-repeat top 5px left 10px;">
-    <p style="padding-top: 5px;">
-        {% comment %} {{ concernusers.user }}： {% endcomment %}
-
-    </p>
-    <p> 
-      <li>
-        <a href="{% url 'concernspersonhome' concernusers.concern_user.id 1 0 %}">{{ concernusers.concern_user }}</a>
-    </li>
-      <span class="msgtime" style="float: right;">{{ concernusers.create_time|date:"Y-m-d_H:m" }}</span>
-    </p>
-    
-</ul>
+<!-- 修改关注列表项结构，添加唯一标识 -->
+<div class="concern-item">
+  <span>{{ concernusers.concern_user.name }}</span>
+  <button class="btn btn-sm btn-concern {% if concernusers %}btn-secondary{% else %}btn-outline-primary{% endif %}"
+        data-concerned-user-id="{{ concernusers.concern_user.id }}">
+    {% if concernusers %}
+    <i class="bi bi-person-check-fill"></i>已关注
+    {% else %}
+    <i class="bi bi-person-plus"></i>关注
+    {% endif %}
+  </button>
+</div>
 {% endfor %}
 <nav aria-label="Page navigation example" class="d-flex justify-content-center">
     <ul class="pagination">
@@ -45,6 +44,46 @@
         {% endif %}
     </ul>
 </nav>
+<script>
 
+  // 使用 jQuery 监听关注按钮的点击事件（关注列表页）
+  $(document).on('click', '.btn-concern', function() {
+    // 获取当前点击的按钮对象
+    const button = $(this);
+    // 从按钮的data属性中获取被关注的用户ID
+    const concernedUserId = button.data('concerned-user-id');
+    
+    //console.log('[FRONTEND] Concern button clicked for user ID:', currentedUserId);
+    console.log('[FRONTEND] Current button state:', button.html());
+
+    $.ajax({
+        url: `/concerns/toggle/${concernedUserId}/`,
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        // 请求成功后的回调函数
+        success: function(response) {
+            console.log('[FRONTEND] AJAX success response:', response);
+            if(response.action === 'concern') {
+                button.html('<i class="bi bi-person-check-fill"></i> 已关注');
+                button.removeClass('btn-outline-primary').addClass('btn-secondary');
+                console.log('[FRONTEND] Updated to: 已关注');
+            } else {
+                button.html('<i class="bi bi-person-plus"></i> 关注');
+                button.removeClass('btn-secondary').addClass('btn-outline-primary');
+
+                console.log('[FRONTEND] Updated to: 关注');
+                
+            }
+        }
+
+    });
+});
+
+
+
+
+
+
+</script>
 
 {% endblock%}

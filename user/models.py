@@ -18,7 +18,7 @@ class MyUser(AbstractUser):
     phone = models.CharField('电话',max_length=15, null=True, blank=True)
     address = models.CharField('地址',max_length=100, null=True, default='暂无')
     wx= models.CharField('微信',max_length=30, null=True, default='暂无')
-    avatar = models.ImageField('头像',upload_to='avatar/',blank=True, null=True)
+    avatar = models.ImageField('头像',upload_to='avatar/',blank=True, null=True, default='media\avatar\屏幕截图_2025-05-06_221514_USm9a9e.png')
     class Meta:
         db_table = 't_Myuser_table'
         verbose_name = '用户表'

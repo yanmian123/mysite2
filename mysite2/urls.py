@@ -36,6 +36,6 @@ urlpatterns = [
     re_path('media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT},name='media'),
     re_path('static/(?P<path>.*)', serve, {'document_root': settings.STATIC_ROOT},name='static'),
     # path("myview/", views.my_view, name="my_view"),  # Add this line to include the view
-    path("verifications/", include('verifications.urls'), name='verifications'),
+    # path("verifications/", include('verifications.urls'), name='verifications'),
     # re_path(r'^ws/article/(?P<article_id>\d+)/$', consumers.CommentConsumer.as_asgi()),
 ]

@@ -1,0 +1,70 @@
+/* 博客列表整体容器样式 */
+.data_list {
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* 博客列表标题样式 */
+.data_list_title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.data_list_title img {
+    margin-right: 10px;
+}
+
+/* 博客文章列表项样式 */
+.datas ul li {
+    list-style: none;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #ccc;
+}
+
+/* 日期样式 */
+.datas ul li span.date {
+    display: block;
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* 标题样式 */
+.datas ul li span.title a {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+}
+
+.datas ul li span.title a:hover {
+    color: #007bff;
+}
+
+/* 摘要样式 */
+.datas ul li span.summary {
+    display: block;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* 图片样式 */
+.datas ul li span.img img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* 文章信息样式（发表时间、阅读量等） */
+.datas ul li span.info {
+    display: block;
+    color: #999;
+    font-size: 13px;
+    margin-top: 5px;
+}

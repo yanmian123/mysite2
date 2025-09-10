@@ -71,14 +71,14 @@ def login(request):
     if MyUser.objects.filter(username=username) or MyUser.objects.filter(phone=username):
         user = authenticate(username=username, password=password)
         if user:
-            uuid = request.POST.get('uuid')
-            code = request.POST.get('code')
-            redis_conn = get_redis_connection('verify_code')#连接到名为verify_code的redistribution数据库，settings.py中可以配置
-            real_code = redis_conn.get(uuid)
-            if not real_code or code != real_code.decode():
-            # 验证码错误
-                 errorInfo='验证码错误'
-            elif user.is_active:
+            # uuid = request.POST.get('uuid')
+            # code = request.POST.get('code')
+            # redis_conn = get_redis_connection('verify_code')#连接到名为verify_code的redistribution数据库，settings.py中可以配置
+            # real_code = redis_conn.get(uuid)
+            # if not real_code or code != real_code.decode():
+            # # 验证码错误
+            #      errorInfo='验证码错误'
+            if user.is_active:
                 auth_login(request, user)
                 if request.POST.get('remember_me') == 'on':
                     request.session.set_expiry(60 * 60 * 24)  # 1天

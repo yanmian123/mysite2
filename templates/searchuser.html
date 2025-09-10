@@ -11,16 +11,29 @@
     {% if userlist %}  
         <ul>
             {% for user3 in userlist %}
+            <div class="concern-item">
                 <li>
-                    {% comment %} <a href="{% url 'concernuser' user3.id request.user.id %}">{{ user3.name}}<button type="button" class="btn "  style="background-color: var(--bs-warning-bg-subtle); --bs-border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text);float: right;">关注</button></a>
-                    <p>{{ user3.name|truncatewords:20 }}</p> {% endcomment %}
-                    <a href="#" data-concern-id="{{ user.id }}" data-user-id="{{ request.user.id }}" class="concern-button">
-                        {{ user.name }}
-                        <button type="button" class="btn {% if user in current_user_concerns %}btn-success{% else %}btn-warning{% endif %}">
-                            {% if user in current_user_concerns %}已关注{% else %}关注{% endif %}
+                    <a href="#" data-concern-id="{{ user3.id }}" data-user-id="{{ request.user.id }}" class="concern-button">
+                        {{ user3.name }}
+
+                          <button class="btn btn-sm btn-concern 
+                          {% if user in current_user_concerns %}
+                          btn-secondary
+                          {% else %}
+                          btn-outline-primary
+                          {% endif %}"
+                                data-concerned-user-id="{{ concernusers.concern_user.id }}"
+                                >
+                            {% if user in current_user_concerns %}
+                            已关注
+                            {% else %}
+                            </i>关注
+                            {% endif %}
                         </button>
+
                     </a>
                 </li>
+            </div>
             {% endfor %}
         </ul>
     {% else %}
@@ -58,55 +71,36 @@
     </nav>
 
 
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function () {
-    const concernButtons = document.querySelectorAll('.concern-button');
-    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-    concernButtons.forEach(function (button) {
-        button.addEventListener('click', function (event) {
-            event.preventDefault();
-            const concernId = this.dataset.concernId; // 获取关注用户的 ID
-            const userId = this.dataset.userId; // 获取当前用户的 ID
-            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+<script>
+    // 使用 jQuery 监听关注按钮的点击事件（搜索用户页）
+    $(document).on('click', '.concern-button', function(event) {
+        event.preventDefault();
+        const button = $(this);
+        const concernId = button.data('concern-id'); // 获取关注用户的 ID
+        const userId = button.data('user-id'); // 获取当前用户的 ID
+        console.log('[FRONTEND] 在搜索页被点击关注的用户的ID:', concernId, '当前用户的ID:', userId);
+        console.log('[FRONTEND] Current button state:', button.find('button').html());
 
-            // 发起异步请求
-            fetch(`/concernuser/${concernId}/${userId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({
-                    concern_id: concernId,
-                    user_id: userId
-                })
-            })
-            .then(function (response) {
-                return response.json();
-            })
-            .then(function (data) {
-                if (data.success) {
-                    if (data.action === 'follow') {
-                        // 更新按钮状态为“已关注”
-                        button.textContent = '已关注';
-                        button.classList.add('btn-success');
-                        button.classList.remove('btn-warning');
-                    } else if (data.action === 'unfollow') {
-                        // 更新按钮状态为“关注”
-                        button.textContent = '关注';
-                        button.classList.add('btn-warning');
-                        button.classList.remove('btn-success');
-                    }
+        $.ajax({
+            url: `/concerns/concernuser/${concernId}/`,
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            // 请求成功后的回调函数
+            success: function(response) {
+                console.log('[FRONTEND] AJAX success response:', response);
+                console.log('[FRONTEND] 提示：当前关注对象ID：', concernId, '当前用户ID：', userId);
+                if(response.action === 'concern') {
+                    button.find('button').html('已关注');
+                    button.find('button').removeClass('btn-warning').addClass('btn-success');
+                    console.log('[FRONTEND] Updated to: 已关注');
                 } else {
-                    alert(data.message || '操作失败，请稍后再试');
+                    button.find('button').html('关注');
+                    button.find('button').removeClass('btn-success').addClass('');
+                    console.log('[FRONTEND] Updated to: 关注');
                 }
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                alert('发生错误，请稍后再试');
-            });
+            }
+
         });
     });
-});
 </script>
 {% endblock %}
