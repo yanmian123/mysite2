@@ -38,6 +38,18 @@ services:
       - redis_data:/data
     command: redis-server --appendonly yes
 
+  celery:
+    build: .
+    command: celery -A mysite2 worker -B -l info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DB_HOST=db
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+
 volumes:
   mysql_data:
   redis_data:

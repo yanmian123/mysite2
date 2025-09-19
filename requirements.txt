@@ -10,3 +10,6 @@ mysqlclient
 
 django-simple-captcha==0.5.17
 Pillow==9.5.0
+celery[redis]==5.3.4
+redis>=4.5.2,<5.0.0,!=4.5.5 
+django-ranged-response==0.2.0

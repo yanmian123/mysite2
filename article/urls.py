@@ -1,6 +1,6 @@
 from django.urls import path
 from django.views.generic.base import RedirectView
-from article.views import article, articledetail, commentdelete,create_article,search_view,commentreply
+from article.views import article, articledetail, commentdelete,create_article,search_view,commentreply,ArticleFeedView,hot_articles
 urlpatterns = [
     # path("test", TestView.as_view(),name='test'),#测试
     path("", RedirectView.as_view(url="user/login.html")),
@@ -10,4 +10,6 @@ urlpatterns = [
     path('create/', create_article, name='article_create'), # 创建文章
     path('search/<int:id>/<int:page>.html', search_view, name='search'),
     path('commentreply/<int:comment_id>/<int:aid>.html', commentreply, name='commentreply'), # 追评
+    path('feed/<int:page>/', ArticleFeedView.as_view(), name='article_feed'),
+    path('hot/<int:id>/', hot_articles, name='hot_articles'),
 ]

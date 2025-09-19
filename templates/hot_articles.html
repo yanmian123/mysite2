@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="data_list bg-white rounded-lg shadow-sm p-4 mb-5">
+    <div class="data_list_title mb-4">
+        <h3><i class="bi bi-fire"></i> 热门文章排行榜</h3>
+    </div>
+    
+    <div class="list-group">
+        {% for article in hot_articles %}
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="flex-grow-1">
+                <h5 class="mb-1">
+                    <a href="{% url 'articledetail' id article.id %}">{{ article.title }}</a>
+                </h5>
+                <small class="text-muted">
+                    作者: {{ article.author.name }} | 
+                    发布时间: {{ article.create_time|date:'Y-m-d' }}
+                </small>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-primary rounded-pill">{{ article.realtime_views }} 阅读</span>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+            <p class="text-muted">暂无热门文章</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

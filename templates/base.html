@@ -4,7 +4,7 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}博客首页{% endblock %}-Powered by python222</title>
+    <title>{% block title %}博客首页{% endblock %}-Powered by lzp666</title>
 
     <link href="{% static "bootstrap/css/bootstrap.css" %}" rel="stylesheet"/>
     <link href="{% static "bootstrap/css/custom2.css" %}" rel="stylesheet"/>
@@ -289,6 +289,12 @@ function updateConcernButton(concernedUserId, action) {
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'concerns' request.user.id 1%}">关注</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'article_feed' 1 %}">关注动态</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'hot_articles' request.user.id %}">热门排行</a>
+                                </li>
                             </ul>
 
                                 <!-- 搜索表单 -->
@@ -340,7 +346,7 @@ function updateConcernButton(concernedUserId, action) {
                           &nbsp;关于我</span>
                             <a href="{% url 'tologinpage' %}" class="d-block text-center mb-2">退出登录</a>
                         <div class="user_image text-center">
-                            {% comment %} <img src="{{ aboutInfo.avatar.url }}" class="rounded-circle mb-2" {% endcomment %}
+                            <img src="{{ aboutInfo.avatar.url }}" class="rounded-circle mb-2"
                                 style="width: 100px; height: 100px;">
                         </div>
                         <div class="nickName text-center">{{ request.user.name }}</div>
@@ -349,8 +355,8 @@ function updateConcernButton(concernedUserId, action) {
                 <!-- 日志类别模块 -->
                 <div class="data_list border rounded p-3 mb-3">
                     <div class="data_list_title d-flex align-items-center mb-2">
-                        {% comment %} <img src="{{ aboutInfo.avatar.url }}" class="me-2 rounded-circle"
-                            style="width: 30px; height: 30px;"/> {% endcomment %}
+                        <img src="{{ aboutInfo.avatar.url }}" class="me-2 rounded-circle"
+                            style="width: 30px; height: 30px;"/>
                         <div>按日志类别</div>
                     </div>
                     <div class="datas">
@@ -364,8 +370,8 @@ function updateConcernButton(concernedUserId, action) {
                 <!-- 友情链接模块 -->
                 <div class="data_list border rounded p-3">
                     <div class="data_list_title d-flex align-items-center mb-2">
-                        {% comment %} <img src="{{ aboutInfo.avatar.url }}" class="me-2 rounded-circle"
-                            style="width: 30px; height: 30px;"/> {% endcomment %}
+                        <img src="{{ aboutInfo.avatar.url }}" class="me-2 rounded-circle"
+                            style="width: 30px; height: 30px;"/>
                         友情链接
                     </div>
                     <div class="datas">

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ArticleType,Article,comment  # Import the ArticleType model
+from .models import ArticleType,Article,Comment  # Import the ArticleType model
 
 # Register your models here.
 
@@ -24,6 +24,6 @@ class ArticleAdmin(admin.ModelAdmin):
 class ArticleTypeAdmin(admin.ModelAdmin):
     list_display = ('title', 'user')
 
-@admin.register(comment)
+@admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('article', 'author', 'user', 'create_time')

@@ -3,7 +3,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from django.db import IntegrityError #捕获数据库完整性错误
-from .models import Article,comment
+from .models import Article,Comment
 
 class CommentConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -99,10 +99,10 @@ class CommentConsumer(AsyncWebsocketConsumer):
         # 处理父评论（如果是回复）
         parent_comment = None
         if parent_id:
-            parent_comment = comment.objects.get(id=parent_id)
+            parent_comment = Comment.objects.get(id=parent_id)
 
         # 创建并保存评论（你的模型类是小写的comment）
-        new_comment = comment.objects.create(
+        new_comment = Comment.objects.create(
             content=content,
             article=article,  # 关联到当前文章
             author=current_user,  # 帖子作者（这里复用为评论的用户关联，根据你的模型设计）

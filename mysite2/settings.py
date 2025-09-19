@@ -66,11 +66,6 @@ ASGI_APPLICATION = 'mysite2.asgi.application'
 #channel配置
 
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    },
-}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -137,59 +132,73 @@ DATABASES = {
 }
 
 
+
+# 根据环境变量判断运行环境
+# if os.path.exists('/.dockerenv') or os.environ.get('DOCKER_CONTAINER'):
+#     # Docker 容器环境
+#     REDIS_HOST = 'redis'
+# else:
+#     # Windows 宿主机环境
+#     REDIS_HOST = 'localhost'
+REDIS_HOST = os.environ.get('REDIS_HOST', 'redis')
+    
 # # Redis 配置
-REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+# REDIS_URL = f'redis://{REDIS_HOST}:6379/0'
+REDIS_BASE_URL = f'redis://{REDIS_HOST}:6379'
+# Celery配置
+# CELERY_BROKER_URL = f'{REDIS_BASE_URL}/3'
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:6379/0'
+# CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:6379/3'
+CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Shanghai'
 
-# # 缓存配置
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": REDIS_URL,
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
+from celery.schedules import crontab
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        },"c_session":{
-                "BACKEND": "django_redis.cache.RedisCache",
-                "LOCATION": "redis://redis:6379/1",  # 根据实际情况修改地址、端口、数据库编号
-                "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-                                            # },"verify_code":{#验证码
-                                            #             "BACKEND": "django_redis.cache.RedisCache",
-                                            #             "LOCATION": "redis://127.0.0.1:6379/2",  # 根据实际情况修改地址、端口、数据库编号
-                                            #             "OPTIONS": {
-                                            #             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-                                            #     }
-    }
-        
+CELERY_BEAT_SCHEDULE = {
+    'sync-article-views-every-hour': {
+        'task': 'article.tasks.sync_article_views_to_db',
+        'schedule': 30,  # 每30秒执行一次
+    },
 }
 
 
-# Channel Layers 配置
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels.layers.InMemoryChannelLayer"
-#     },
-# }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f'{REDIS_BASE_URL}/0',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,  # 忽略Redis连接异常，防止Django崩溃
+        }
+    },
+    "session": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f'{REDIS_BASE_URL}/1',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "locmem": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
+
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis", 6379)],  # 使用服务名
+            "hosts": [f'{REDIS_BASE_URL}/2']
         },
     },
 }
 
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "c_session"  # 使用默认缓存配置
+SESSION_CACHE_ALIAS = "session"  # 使用默认缓存配置
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

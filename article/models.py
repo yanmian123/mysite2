@@ -52,7 +52,7 @@ class Article(models.Model):
         verbose_name = "博客帖子管理"
         verbose_name_plural = "博客帖子管理"
         
-class comment(models.Model):
+class Comment(models.Model):
     """
     博客评论实体
     """
